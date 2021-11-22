@@ -14,7 +14,7 @@ import "./NFTDescriptor.sol";
 
 contract SkyLight is Context, ERC721Enumerable, Ownable, RoyaltiesV2Impl, AccessControlEnumerable {
     mapping(uint256 => NFTDescriptor.ConstructTokenURIParams) _metadatas;
-    mapping(string => uint256) public minted;
+    mapping(string => bool) public minted;
 
     uint256 mTokenId;
     NFTDescriptor mRender;
@@ -45,13 +45,13 @@ contract SkyLight is Context, ERC721Enumerable, Ownable, RoyaltiesV2Impl, Access
 
     function mint(address to, NFTDescriptor.ConstructTokenURIParams calldata params) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "ERC721: must have admin role to mint");
-        require(mTokenId == 0 || minted[params.name] == 0, "Item already minted");
+        require(!minted[params.name], "Item already minted");
 
         NFTDescriptor.ConstructTokenURIParams memory _params = params;
 
         _params.tokenId = mTokenId;
         _metadatas[mTokenId] = _params;
-        minted[_params.name] = mTokenId;
+        minted[params.name] = true;
         _mint(to, mTokenId);
         mTokenId++;
     }
